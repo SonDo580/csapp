@@ -1,3 +1,5 @@
+.vscode
+
 **/*.exe
 code/**/*.s
 code/**/*.o
