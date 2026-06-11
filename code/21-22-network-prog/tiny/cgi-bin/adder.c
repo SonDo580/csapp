@@ -22,11 +22,11 @@ int main(void)
     }
 
     // Make the response body
-    sprintf(content, "Welcome to add.com: ");
-    sprintf(content, "%sThe Internet addition portal.\r\n", content);
-    sprintf(content, "%sThe answer is: %d + %d = %d\r\n",
-            content, n1, n2, n1 + n2);
-    sprintf(content, "%sThanks for visiting!\r\n", content);
+    snprintf(content, sizeof(content),
+             "Welcome to add.com: THE Internet addition portal.\r\n"
+             "The answer is: %d + %d = %d\r\n"
+             "Thanks for visiting!\r\n",
+             n1, n2, n1 + n2);
 
     // Generate the HTTP response
     printf("Connection: close\r\n");

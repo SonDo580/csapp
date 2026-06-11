@@ -5,7 +5,7 @@ LIB = -lpthread
 all: tiny cgi
 
 tiny:
-	$(CC) $(CFLAGS) tiny.c $(LIB) -o tiny.exe
+	$(CC) $(CFLAGS) tiny.c csapp.c $(LIB) -o tiny.exe
 
 cgi:
 	(cd cgi-bin; make)

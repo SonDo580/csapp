@@ -157,15 +157,17 @@ int parse_uri(char *uri, char *filename, char *cgiargs)
 void serve_static(int fd, char *filename, int filesize)
 {
     int srcfd;
-    char *srcp, filetype[MAXLINE], buf[MAXBUF];
+    char *srcp, filetype[256], buf[MAXBUF];
 
     // Send response headers to client
     get_filetype(filename, filetype);
-    sprintf(buf, "HTTP/1.0 200 OK\r\n");
-    sprintf(buf, "%sServer: Tiny Web Server\r\n", buf);
-    sprintf(buf, "%sConnection: close\r\n", buf);
-    sprintf(buf, "%sContent-length: %d\r\n", buf, filesize);
-    sprintf(buf, "%sContent-type: %s\r\n\r\n", buf, filetype);
+    snprintf(buf, sizeof(buf),
+             "HTTP/1.0 200 OK\r\n"
+             "Server: Tiny Web Server\r\n"
+             "Connection: close\r\n"
+             "Content-length: %d\r\n"
+             "Content-type: %s\r\n\r\n",
+             filesize, filetype);
     Rio_writen(fd, buf, strlen(buf));
     printf("Response headers:\n");
     printf("%s", buf);
@@ -221,19 +223,22 @@ void clienterror(
     char buf[MAXLINE], body[MAXBUF];
 
     // Build the HTTP response body
-    sprintf(body, "<html><title>Tiny Error</title>");
-    sprintf(body, "%s<body bgcolor=\"ffffff\">\r\n", body);
-    sprintf(body, "%s<p>%s: %s</p>\r\n", body, errnum, shortmsg);
-    sprintf(body, "%s<p>%s: %s</p>\r\n", body, longmsg, cause);
-    sprintf(body, "%s<hr><em>The Tiny Web server</em>\r\n", body);
-    sprintf(body, "%s</body></html>\r\n", body);
+    snprintf(body, sizeof(body),
+             "<html>"
+             "<title>Tiny Error</title>"
+             "<body bgcolor=\"ffffff\">"
+             "<p>%s: %s</p>"
+             "<p>%s: %s</p>"
+             "<hr><em>The Tiny Web server</em>"
+             "</body></html>",
+             errnum, shortmsg, longmsg, cause);
 
     // Print the HTTP response
-    sprintf(buf, "HTTP/1.0 %s %s\r\n", errnum, shortmsg);
-    Rio_writen(fd, buf, strlen(buf));
-    sprintf(buf, "Content-type: text/html\r\n");
-    Rio_writen(fd, buf, strlen(buf));
-    sprintf(buf, "Content-length: %d\r\n\r\n", (int)strlen(body));
-    Rio_writen(fd, buf, strlen(buf));
-    Rio_writen(fd, body, strlen(body));
+    snprintf(buf, sizeof(buf),
+             "HTTP/1.0 %s %s\r\n"
+             "Content-type: text/html\r\n"
+             "Content-length: %d\r\n\r\n",
+             errnum, shortmsg, (int)strlen(body));
+    Rio_writen(fd, buf, strlen(buf));   // response headers
+    Rio_writen(fd, body, strlen(body)); // response body
 }
