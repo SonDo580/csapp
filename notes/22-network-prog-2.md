@@ -55,12 +55,12 @@ int connect(int clientfd, SA *addr, socklen_t addrlen);
 - resulting connection is characterized by socket pair: `(client_addr:ephemeral_port, addr.sin_addr:addr.sin_port)`.
 - best practice: use `getaddrinfo` to supply arguments `addr` and `addrlen`.
 
-## Connection vs Listening descriptors
+## Connected vs Listening descriptors
 
 - Listening descriptor:
   - endpoint for client connection requests.
   - created once and exists for lifetime of the server.
-- Connection descriptor:
+- Connected descriptor:
   - endpoint of the connection between client and server.
   - created each time the server accepts a connection requests from a client.
   - exists only as long as it takes to service client.
