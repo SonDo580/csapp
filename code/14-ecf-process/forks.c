@@ -133,7 +133,7 @@ void fork11()
     // parent
     for (i = 0; i < N; i++)
     {
-        pid_t wpid = wait(&child_status);
+        pid_t wpid = waitpid(pid[i], &child_status, 0);
         if (WIFEXITED(child_status))
             printf("Child %d terminated with exit status %d\n",
                    wpid, WEXITSTATUS(child_status));
