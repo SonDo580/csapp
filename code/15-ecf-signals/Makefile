@@ -14,7 +14,7 @@ all: $(EXES)
 
 $(PROGS): %: %.exe
 
-$(EXES): %.exe: %.c $(CSAPP_OBJ) $(CSAPP_HDR)
+$(EXES): %.exe: %.c $(CSAPP_OBJ)
 	$(CC) $(CFLAGS) $< $(CSAPP_OBJ) -o $@
 
 $(CSAPP_OBJ): $(CSAPP_SRC) $(CSAPP_HDR)
