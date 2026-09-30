@@ -14,7 +14,7 @@
 ## Representing sets
 
 - **Representation:**
-  - Width w bit vector represents subset {0, ..., w-1}
+  - w-bit vector represents subset {0, ..., w-1}
   - a[i] = 1 if i belongs to A
   - 01101001 <-> {0, 3, 5, 6}
   - 01010101 <-> {0, 2, 4, 6}
@@ -247,7 +247,7 @@ t = u + v;
 
 true product requires up to 2*w bits
 -> ignore high order w bits
-. UMultw(u, v) = u*v mod 2
+. UMultw(u, v) = u*v mod 2^w
 ```
 
 - **Signed multiplication:**
@@ -287,7 +287,7 @@ u >> k <-> floor(u / 2^k)
 - Multiplication:
   - unsigned/signed: normal multiplication followed by truncate, same operation on bit level
   - unsigned: multiplication mod 2^w
-  - signed: perform unsigned multiplication then interpret the resulting bits as signed
+  - signed: perform unsigned multiplication then interpret the resulting lower w bits as signed
 
 ## When to use unsigned
 
@@ -307,7 +307,7 @@ for (i = cnt-2; i >= 0; i--)
 unsigned i;
 for (i = cnt-2; i < cnt; i--)
   a[i] += a[i+1];
-// when i becomes -1 and wrap around to Umax, i < cnt becomes false
+// when i becomes -1 and wrap around to Umax, i < cnt becomes false (unless cnt = Umax)
 ```
 
 ```c

@@ -20,7 +20,7 @@ w = 32 (4 bytes) -> x << 30 == (110...0) < 0
 . x > y -> -x < -y
 -> False
 y = Tmin -> -y = Tmin
-x > Tmin -> min -x = -Tmax > Tmin = -y
+any x > Tmin will have -x > Tmin
 
 . x * x >= 0
 -> False
@@ -35,7 +35,7 @@ positive overflow (become negative) if mathematical product > Tmax
 
 . x <= 0 -> -x >= 0
 -> False
--Tmin = -Tmin (positive overflow)
+-Tmin = Tmin (positive overflow)
 
 . (x | -x) >> 31 == -1
 -> False
@@ -54,15 +54,14 @@ x = 0 -> (0 | -0) >> 31 = 0
 -> False
 . x >> 3 (arithmetic shift) performs floor division
 . x / 8 performs truncation towards 0
-. only True if x is multiple of 8
+. True if x >= 0 OR x is a multiple of 8
 
 . x & (x - 1) != 0
 -> False
 . x = 2^k -> x & (x - 1) == 0
-    H 1 0 ... 0     <- x
-&   H 0 1 ... 1     <- x - 1
-    H 0 0 ... 0     <- discards the lowest order '1'
-. x = 2^k -> x & (x - 1) discards the only '1' bit (becomes 0)
+    1 0 ... 0     <- x
+&   0 1 ... 1     <- x - 1
+    0 0 ... 0
 ```
 
 # Boolean algebra
@@ -164,10 +163,10 @@ TCompw(u) = u     if u == Tmin
 
 # Math properties of UMult
 
-- **Closed** under addition:
+- **Closed** under multiplication:
 
 ```
-0 <= UMultw(u, v) <= Tmax
+0 <= UMultw(u, v) <= Umax
 ```
 
 - **Commutative:**
@@ -270,7 +269,7 @@ Address     Instruction Code        Assembly
 x*12
 = (x * 3) * 4
 = (x + x * 2) * 2^2
-= (x + x*2) << 2
+= (x + (x << 1)) << 2
 ```
 
 - unsigned division <-> logical right shift
@@ -415,7 +414,7 @@ malloc(ele_cnt * ele_size);
 
 /*
 What if:
-. ele_cnt = 2^20 +1
+. ele_cnt = 2^20 + 1
 . ele_size = 2^12 = 4096
 -> mathematical product = 2^32 + 4096
 
@@ -436,10 +435,11 @@ void *copy_elements(void *ele_src[], int ele_cnt, size_t ele_size) {
     // Prevent negative ele_cnt
     if (ele_count < 0)
         return NULL
-    
+
     // Check for overflow
     if (ele_size > 0 && ele_cnt > (SIZE_MAX / ele_size))
         // . SIZE_MAX is the maximum value for object of size size_t
+        //   (so ele_cnt * ele_size will not wrap around)
         // . check ele_size > 0 to avoid division by 0
         return NULL;
 
