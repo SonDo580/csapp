@@ -190,12 +190,12 @@ s exp      frac
 - `even`: when LSB is 0
 - `halfway`:
   - when bits to right of rounding position is `10...0`
-  - `0___1___`: less than halfway
-  - `10___1___`: greater than halfway
+  - `___|0___1___`: less than halfway
+  - `___|10___1___`: greater than halfway
 - Example: round to nearest 1/4 (2 bits right to binary point)
 
 ```
-(note: 1/2 denotes halfway between 2 values, not the value 1/2)
+(note: 1/2 in 'actions' denotes halfway between 2 values, not the value 1/2)
 
 Value   Binary      Rounded   Action        Rounded Value
 2 3/32  10.00|011   10.00     (<1/2—down)   2
@@ -208,7 +208,7 @@ Value   Binary      Rounded   Action        Rounded Value
 
 - `(-1)^s1 * M1 * 2^E1 * (-1)^s2 * M2 * 2^E2`
 - Math result: `(-1)^s * M * 2^E`
-  - `s`: s1 ^ s2 (result is negative if signs are different)
+  - `s`: s1 XOR s2 (result is negative if signs are different)
   - `M`: `M1 * M2`
   - `E`: E1 + E2
 - Fix:
@@ -243,14 +243,15 @@ ________________________________
 ### Math properties of FP Add
 
 - **Closed** under addition
-  - **But** may generate inf or NaN
+  - **But** may generate inf or NaN 
+  - generate NaN example: +inf + -inf, +inf - +inf, ...
 - **Commutative**
 - **NOT Associative**
   - due to overflow and inexactness of rounding
   - example:
     - (3.14 + 1e10) - 1e10 = 0
     - 3.14 + (1e10 - 1e10) = 3.14
-- 0 is **additive identity**
+- 0 (+0 and -0) is **additive identity**
 - Every element has an **additive inverse**
   - except for inf & NaN
 - **Monotonicity**: a >= b -> a+c >= b+c
@@ -260,6 +261,7 @@ ________________________________
 
 - **Closed** under multiplication
   - **But** may generate inf or NaN
+  - generate NaN example: `0 * inf`, `inf * 0`, ...
 - **Commutative**
 - **NOT Associative**
   - due to overflow and inexactness of rounding
@@ -271,7 +273,7 @@ ________________________________
   - due to overflow and inexactness of rounding
   - example:
     - `1e20 * (1e20 - 1e20) = 0.0`
-    - `1e20 * 1e20 - 1e20 * 1e20 = NaN`
+    - `1e20 * 1e20 - 1e20 * 1e20 = NaN` (+inf - +inf)
 - **Monotonicity**: `a >= b & c >= 0 -> a*c >= b*c`
   - except for inf & NaN
 
@@ -344,13 +346,12 @@ double d = ...;
 
 . d * d >= 0.0
 -> False
-. d is NaN -> d*d is NaN -> any comparison with d*d is False
+. d is NaN -> d*d is NaN -> any comparison with NaN is False
 . True for other cases
 
 . (d + f) - d == f
 -> False
-. due to rounding: d is very large and f is very small
-. d == +inf and f is finite
+. (due to rounding) d == +inf and f is finite
   (+inf + f) - (+inf) = (+inf) - (+inf) = NaN
   NaN == f is False
 ```
